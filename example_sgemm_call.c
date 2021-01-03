@@ -6,9 +6,9 @@
 #define B(i, j) B[ (i)*ldB + (j) ]
 #define C(i, j) C[ (i)*ldC + (j) ]
 
-#define M 6
-#define N 6
-#define K 6
+#define M 600
+#define N 600
+#define K 600
 const int ldA = K;
 const int ldB = N;
 const int ldC = N;

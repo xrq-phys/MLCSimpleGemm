@@ -47,15 +47,19 @@ func MLCSimpleSGEMM(transA: Bool,
     iPlan.execute(inputsData: ["A": datA, "B": datB, "C": datC],
                   batchSize: 0,
                   options: []) { (ans, err, elapsed) in
-        print("MLC: Errors: \(String(describing: err))")
-        print("MLC: Result: \(String(describing: ans))")
+        #if DEBUG
+            print("MLC: Errors: \(String(describing: err))")
+            print("MLC: Result: \(String(describing: ans))")
+        #endif
 
         ans!.copyDataFromDeviceMemory(toBytes: addrC,
                                       length: m * n * MemoryLayout<Float>.size,
                                       synchronizeWithDevice: false)
 
         let arrayC = UnsafeBufferPointer(start: addrC, count: m * n)
-        print(Array(arrayC))
+        #if DEBUG
+            print(Array(arrayC))
+        #endif
     }
 }
 
