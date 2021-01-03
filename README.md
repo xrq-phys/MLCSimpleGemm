@@ -3,8 +3,13 @@ Calling Apple's ML Compute SGEMM from C.
 To compile:
 
 ```bash
-clang -c example_sgemm_call.c -o example_sgemm_call.o
+# Compile Swift
 swiftc -emit-library -c MLCSimpleGemm.swift -o MLCSimpleGemm.o
-swiftc example_sgemm_call.o MLCSimpleGemm.o -o example_sgemm_call.x
+# Link to dynamic library.
+# Use a intermediate layer to fix symbol.
+clang -shared csymbol.c MLCSimpleGemm.o -L/usr/lib/swift -lswiftCore -o MLCSimpleGemm.dylib
+
+# With the symbol fixed, it's now possible to directly link from a usual C program.
+clang example_sgemm_call.c MLCSimpleGemm.dylib -o example_sgemm_call.x
 ```
 

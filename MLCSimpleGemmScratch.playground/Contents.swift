@@ -1,7 +1,8 @@
 import Foundation
 import MLCompute
+import PlaygroundSupport
 
-@_cdecl("mlcsgemm_simple_")
+@_cdecl("mlcsgemm_simple")
 func MLCSimpleSGEMM(transA: Bool,
                     transB: Bool,
                     m: Int,
@@ -33,7 +34,7 @@ func MLCSimpleSGEMM(transA: Bool,
                                                                                transposesY: transB)!)!,
                           sources: [tA!, tB!])
     iGraph.node(with: MLCArithmeticLayer(operation: .add), sources: [tAB!, tC])
-
+    
     let iPlan = MLCInferenceGraph(graphObjects: [iGraph])
     iPlan.addInputs(["A": tA!, "B": tB!, "C": tC])
     iPlan.compile(options: .linkGraphs, device: MLCDevice())
@@ -47,20 +48,33 @@ func MLCSimpleSGEMM(transA: Bool,
     iPlan.execute(inputsData: ["A": datA, "B": datB, "C": datC],
                   batchSize: 0,
                   options: []) { (ans, err, elapsed) in
-        #if DEBUG
-            print("MLC: Errors: \(String(describing: err))")
-            print("MLC: Result: \(String(describing: ans))")
-        #endif
-
+        print("MLC: Errors: \(String(describing: err))")
+        print("MLC: Result: \(String(describing: ans))")
+        
         ans!.copyDataFromDeviceMemory(toBytes: addrC,
                                       length: m * n * MemoryLayout<Float>.size,
                                       synchronizeWithDevice: false)
-
+        
         let arrayC = UnsafeBufferPointer(start: addrC, count: m * n)
-        #if DEBUG
-            print(Array(arrayC))
-        #endif
+        print(Array(arrayC))
     }
 }
 
+let iPage = PlaygroundPage.current
+iPage.needsIndefiniteExecution = true
 
+var bufA: [Float] = [1, 2, 3, 4]
+var bufB: [Float] = [1, 2, 3, 4]
+var bufC: [Float] = [1, 1, 1, 1]
+
+let ptrA = UnsafeMutablePointer<Float>(mutating: bufA)
+let ptrB = UnsafeMutablePointer<Float>(mutating: bufB)
+let ptrC = UnsafeMutablePointer<Float>(mutating: bufC)
+
+MLCSimpleSGEMM(transA: false, transB: false,
+               m: 2, n: 2, k: 2,
+               alpha: 1.0,
+               addrA: ptrA,
+               addrB: ptrB,
+               addrC: ptrC)
+print(bufC)
