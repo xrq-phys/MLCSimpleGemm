@@ -37,7 +37,7 @@ func MLCSimpleSGEMM(transA: Bool,
     
     let iPlan = MLCInferenceGraph(graphObjects: [iGraph])
     iPlan.addInputs(["A": tA!, "B": tB!, "C": tC])
-    iPlan.compile(options: .linkGraphs, device: MLCDevice())
+    iPlan.compile(options: .linkGraphs, device: MLCDevice(gpuDevices: MTLCopyAllDevices())!)
 
     // Prepare inputs.
     let datA = MLCTensorData(bytesNoCopy: addrA, length: m * k * MemoryLayout<Float>.size)

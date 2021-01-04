@@ -35,7 +35,7 @@ mmul_simple!(tA::Bool,
            Ptr{Float32},
            Ptr{Float32}),
           tB, tA,
-          m, n, k,
+          n, m, k,
           α,
           B, A, C);
     C
