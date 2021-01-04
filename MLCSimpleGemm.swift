@@ -36,7 +36,7 @@ func MLCSimpleSGEMM(transA: Bool,
 
     let iPlan = MLCInferenceGraph(graphObjects: [iGraph])
     iPlan.addInputs(["A": tA!, "B": tB!, "C": tC])
-    iPlan.compile(options: .linkGraphs, device: MLCDevice(gpuDevices: MTLCopyAllDevices())!)
+    iPlan.compile(options: .linkGraphs, device: MLCDevice.gpu()!)
 
     // Prepare inputs.
     let datA = MLCTensorData(bytesNoCopy: addrA, length: m * k * MemoryLayout<Float>.size)
@@ -46,7 +46,7 @@ func MLCSimpleSGEMM(transA: Bool,
     // Execute graph.
     iPlan.execute(inputsData: ["A": datA, "B": datB, "C": datC],
                   batchSize: 0,
-                  options: []) { (ans, err, elapsed) in
+                  options: .synchronous) { (ans, err, elapsed) in
         #if DEBUG
             print("MLC: Errors: \(String(describing: err))")
             print("MLC: Result: \(String(describing: ans))")
